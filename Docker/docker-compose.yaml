@@ -3,7 +3,11 @@ services:
     build:
       context: .
       dockerfile: php/Dockerfile
+      args:
+        USER_ID: 1000
+        GROUP_ID: 1000
     container_name: pizza-app
+    user: "1000:1000"
     volumes:
       - ../:/var/www
     extra_hosts:
