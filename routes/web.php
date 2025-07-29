@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
-
 Route::get('/health', function() {
     try
     {
@@ -21,4 +20,3 @@ Route::get('/health', function() {
         ], 503);
     }
 });
-

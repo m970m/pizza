@@ -7,62 +7,36 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductStoreRequest;
 use App\Http\Requests\ProductUpdateRequest;
 use App\Models\Product;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
 class ProductController extends Controller
 {
     public function index(): JsonResponse
     {
-        $products = Product::all();
-        return response()->json($products);
+        return response()->json(Product::all());
     }
 
     public function store(ProductStoreRequest $request): JsonResponse
     {
-        $validatedData = $request->validated();
-        $product = Product::create($validatedData);
+        $product = Product::create($request->validated());
+        return response()->json($product, Response::HTTP_CREATED);
+    }
 
+    public function show(Product $product)
+    {
         return response()->json($product);
     }
 
-    public function show($id)
+    public function update(ProductUpdateRequest $request, Product $product)
     {
-        try
-        {
-            $product = Product::findOrFail($id);
-            return response()->json($product);
-        } catch (ModelNotFoundException $exception)
-        {
-            return response()->json(['message' => 'Product not found.'], 404);
-        } catch (\Exception $exception)
-        {
-            return response()->json(['message' => 'An error occurred.'], 500);
-        }
-    }
-
-    public function update(ProductUpdateRequest $request, $id)
-    {
-        $validatedData = $request->validated();
-        $product = Product::findOrFail($id);
-        $product->update($validatedData);
-
+        $product->update($request->validated());
         return response()->json($product);
     }
 
-    public function destroy($id)
+    public function destroy(Product $product)
     {
-        try
-        {
-            $product = Product::findOrFail($id);
-            $product->delete();
-            return response()->json([], 204);
-        } catch (ModelNotFoundException $exception)
-        {
-            return response()->json(['message' => 'Product not found'], 404);
-        } catch (\Exception $exception)
-        {
-            return response()->json(['message' => 'An error occurred.'], 500);
-        }
+        $product->delete();
+        return response()->json(null, Response::HTTP_NO_CONTENT);
     }
 }

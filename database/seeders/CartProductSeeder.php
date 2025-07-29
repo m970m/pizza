@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\CartItem;
+use App\Models\CartProduct;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
-class CartItemSeeder extends Seeder
+class CartProductSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -19,7 +19,7 @@ class CartItemSeeder extends Seeder
 
         if ($users->isEmpty() || $products->isEmpty())
         {
-            CartItem::factory(20)->create();
+            CartProduct::factory(20)->create();
             return;
         }
 
@@ -28,7 +28,7 @@ class CartItemSeeder extends Seeder
             $userProducts = $products->random(rand(0, min(5, $products->count())));
             foreach ($userProducts as $product)
             {
-                CartItem::factory()->create([
+                CartProduct::factory()->create([
                     'user_id' => $user->id,
                     'product_id' => $product->id
                 ]);

@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class CartItem extends Model
+class CartProduct extends Model
 {
     use HasFactory;
 
-    protected $table = 'cart_items';
+    protected $table = 'cart_product';
     public $timestamps = false;
     public $guarded = ['id'];
 
