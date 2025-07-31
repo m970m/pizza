@@ -5,16 +5,17 @@ namespace App\Http\Controllers\Auth;
 
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\LoginRequest;
-use App\Http\Requests\UserRequest;
+use App\Http\Requests\UserLoginRequest;
+use App\Http\Requests\UserRegisterRequest;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    public function register(UserRequest $request)
+    public function register(UserRegisterRequest $request): JsonResponse
     {
         $userData = $request->validated();
         $userData['role'] = UserRole::CUSTOMER;
@@ -24,7 +25,7 @@ class AuthController extends Controller
         return response()->json(['token' => $token], Response::HTTP_CREATED);
     }
 
-    public function login(LoginRequest $request)
+    public function login(UserLoginRequest $request): JsonResponse
     {
         $credentials = $request->validated();
 
@@ -35,13 +36,13 @@ class AuthController extends Controller
         return response()->json(['token' => $token]);
     }
 
-    public function logout()
+    public function logout(): JsonResponse
     {
         Auth::logout();
         return response()->json(['message' => 'Logged out successfully.']);
     }
 
-    public function me()
+    public function me(): JsonResponse
     {
         return response()->json(Auth::user());
     }

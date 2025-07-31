@@ -1,5 +1,7 @@
 <?php
 
+use App\Exceptions\EmptyCartException;
+use App\Exceptions\LimitProductException;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -18,5 +20,14 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function(Exceptions $exceptions): void {
-        //
+        $exceptions->renderable(function(EmptyCartException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], $e->getStatusCode());
+        });
+        $exceptions->renderable(function(LimitProductException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], $e->getStatusCode());
+        });
     })->create();

@@ -2,11 +2,11 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\ProductType;
+use App\Enums\OrderStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class ProductStoreRequest extends FormRequest
+class OrderUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,11 +24,7 @@ class ProductStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'type' => ['required', Rule::enum(ProductType::class)],
-            'price' => 'required|decimal:0,2|min:0',
-            'description' => 'required|string|max:255',
-            'image' => 'required|string|max:255'
+            'status' => ['required', Rule::enum(OrderStatus::class)]
         ];
     }
 }

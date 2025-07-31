@@ -23,18 +23,18 @@ class ProductController extends Controller
         return response()->json($product, Response::HTTP_CREATED);
     }
 
-    public function show(Product $product)
+    public function show(Product $product): JsonResponse
     {
         return response()->json($product);
     }
 
-    public function update(ProductUpdateRequest $request, Product $product)
+    public function update(ProductUpdateRequest $request, Product $product): JsonResponse
     {
         $product->update($request->validated());
         return response()->json($product);
     }
 
-    public function destroy(Product $product)
+    public function destroy(Product $product): JsonResponse
     {
         $product->delete();
         return response()->json(null, Response::HTTP_NO_CONTENT);

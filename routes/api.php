@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\Api\CartProductController;
+use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
@@ -15,11 +16,20 @@ Route::middleware('auth:api')->group(function() {
     Route::get('/me', [AuthController::class, 'me']);
 
     Route::middleware('role:customer')->group(function() {
-        Route::apiResource('/cart_product', CartProductController::class)
-            ->except('update');
+        Route::prefix('cart')->group(function() {
+            Route::get('/', [CartController::class, 'index']);
+            Route::post('/', [CartController::class, 'store']);
+            Route::delete('/{id}', [CartController::class, 'remove']);
+            Route::delete('/{id}/all', [CartController::class, 'removeAll']);
+            Route::put('/', [CartController::class, 'update']);
+        });
+        Route::get('/orders', [OrderController::class, 'index']);
+        Route::post('/orders', [OrderController::class, 'store']);
     });
+
 
     Route::middleware('role:admin')->group(function() {
         Route::apiResource('/products', ProductController::class);
+        Route::patch('/orders/{order}', [OrderController::class, 'update']);
     });
 });
