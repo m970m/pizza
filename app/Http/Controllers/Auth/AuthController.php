@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
@@ -27,8 +28,9 @@ class AuthController extends Controller
 
     public function login(UserLoginRequest $request): JsonResponse
     {
-        $credentials = $request->validated();
+        $credentials = $request->only('email', 'password');
 
+        $user = User::where('email', $credentials['email'])->first();
         if (!$token = Auth::attempt($credentials)) {
             return response()->json(['error'=>'Invalid credentials'], Response::HTTP_UNAUTHORIZED);
         }

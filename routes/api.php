@@ -29,7 +29,8 @@ Route::middleware('auth:api')->group(function() {
 
 
     Route::middleware('role:admin')->group(function() {
-        Route::apiResource('/products', ProductController::class);
+        Route::apiResource('/products', ProductController::class)->except('index', 'show');
         Route::patch('/orders/{order}', [OrderController::class, 'update']);
+        Route::get('/orders/all', [OrderController::class, 'getAllOrders']);
     });
 });

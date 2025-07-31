@@ -49,4 +49,9 @@ class OrderController extends Controller
         $order->update($request->validated());
         return response()->json($order);
     }
+
+    public function getAllOrders(): JsonResponse
+    {
+        return response()->json(Order::all());
+    }
 }
