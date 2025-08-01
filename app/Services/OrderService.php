@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\OrderStatus;
 use App\Exceptions\EmptyCartException;
 use App\Models\Order;
 use App\Models\User;
@@ -21,12 +22,14 @@ class OrderService
         }
 
         return DB::transaction(function() use ($orderData, $user, $cartProducts) {
+            $totalPrice = $cartProducts->sum(fn($cp) => $cp->product->price * $cp->quantity);
             $order = Order::factory()->create([
                 'user_id' => $user->id,
-                'status' => 'new',
+                'status' => OrderStatus::PENDING,
                 'phone_number' => $orderData['phone_number'],
                 'delivery_address' => $orderData['delivery_address'],
-                'delivery_time' => $orderData['delivery_time']
+                'delivery_time' => $orderData['delivery_time'],
+                'total' => $totalPrice,
             ]);
 
             $orderProductData = $this->buildOrderProductData($cartProducts);

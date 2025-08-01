@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('product_id')->nullable();
             $table->string('name');
             $table->string('type');
-            $table->decimal('price', 10, 2);
+            $table->unsignedInteger('price');
             $table->string('description');
             $table->unsignedTinyInteger('quantity');
             $table->foreign('order_id')->references('id')->on('orders')->cascadeOnDelete();

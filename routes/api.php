@@ -19,14 +19,16 @@ Route::middleware('auth:api')->group(function() {
         Route::prefix('cart')->group(function() {
             Route::get('/', [CartController::class, 'index']);
             Route::post('/', [CartController::class, 'store']);
-            Route::delete('/{id}', [CartController::class, 'remove']);
-            Route::delete('/{id}/all', [CartController::class, 'removeAll']);
+            Route::delete('/{id}', [CartController::class, 'removeProduct']);
+            Route::delete('/{id}/all', [CartController::class, 'removeProductLine']);
             Route::put('/', [CartController::class, 'update']);
         });
-        Route::get('/orders', [OrderController::class, 'index']);
-        Route::post('/orders', [OrderController::class, 'store']);
+        Route::prefix('orders')->group(function() {
+            Route::get('/', [OrderController::class, 'index']);
+            Route::post('/', [OrderController::class, 'store']);
+            Route::get('/{order}', [OrderController::class, 'show'])->whereNumber('order');
+        });
     });
-
 
     Route::middleware('role:admin')->group(function() {
         Route::apiResource('/products', ProductController::class)->except('index', 'show');

@@ -13,7 +13,7 @@ class CartProduct extends Model
 
     protected $table = 'cart_product';
     public $timestamps = false;
-    public $guarded = ['id'];
+    protected $guarded = ['id', 'created_at', 'updated_at'];
 
     public function user(): BelongsTo
     {

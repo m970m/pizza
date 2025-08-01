@@ -15,10 +15,17 @@ class ProductControllerTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function tokenForRole(UserRole $role): string
+    {
+        $user = User::factory()->create(['role' => $role->value]);
+        return JWTAuth::fromUser($user);
+    }
+
     #[Test]
-    public function index_returns_paginated_products(): void
+    public function index_returns_paginated_products()
     {
         Product::factory()->count(20)->create();
+
         $this->getJson('api/products')
             ->assertOk()
             ->assertJsonStructure([
@@ -34,6 +41,7 @@ class ProductControllerTest extends TestCase
     public function show_returns_single_product()
     {
         $product = Product::factory()->create();
+
         $this->getJson("api/products/{$product->id}")
             ->assertOk()
             ->assertJson([
@@ -50,6 +58,7 @@ class ProductControllerTest extends TestCase
     public function store_requires_authentication()
     {
         $payload = Product::factory()->make()->toArray();
+
         $this->postJson('/api/products', $payload)
             ->assertUnauthorized();
     }
@@ -57,10 +66,9 @@ class ProductControllerTest extends TestCase
     #[Test]
     public function store_requires_admin_role()
     {
-        $customer = User::factory()->create(['role' => UserRole::CUSTOMER->value]);
-        $token = JWTAuth::fromUser($customer);
         $payload = Product::factory()->make()->toArray();
-        $this->withToken($token)
+
+        $this->withToken($this->tokenForRole(UserRole::CUSTOMER))
             ->postJson('/api/products', $payload)
             ->assertForbidden();
     }
@@ -68,8 +76,6 @@ class ProductControllerTest extends TestCase
     #[Test]
     public function admin_can_store_a_product()
     {
-        $admin = User::factory()->create(['role' => UserRole::ADMIN->value]);
-        $token = JWTAuth::fromUser($admin);
         $payload = [
             'name' => 'New Pizza',
             'type' => ProductType::PIZZA->value,
@@ -78,7 +84,7 @@ class ProductControllerTest extends TestCase
             'image' => 'new_pizza.jpg',
         ];
 
-        $this->withToken($token)
+        $this->withToken($this->tokenForRole(UserRole::ADMIN))
             ->postJson('/api/products', $payload)
             ->assertCreated()
             ->assertJson([
@@ -96,6 +102,7 @@ class ProductControllerTest extends TestCase
     {
         $product = Product::factory()->create();
         $payload = ['name' => 'Updated pizza'];
+
         $this->patchJson("/api/products/{$product->id}", $payload)
             ->assertUnauthorized();
     }
@@ -103,11 +110,10 @@ class ProductControllerTest extends TestCase
     #[Test]
     public function update_requires_admin_role()
     {
-        $customer = User::factory()->create(['role' => UserRole::CUSTOMER->value]);
-        $token = JWTAuth::fromUser($customer);
         $product = Product::factory()->create();
         $payload = ['name' => 'Updated pizza'];
-        $this->withToken($token)
+
+        $this->withToken($this->tokenForRole(UserRole::CUSTOMER))
             ->patchJson("/api/products/{$product->id}", $payload)
             ->assertForbidden();
     }
@@ -115,11 +121,9 @@ class ProductControllerTest extends TestCase
     #[Test]
     public function admin_can_update_a_product()
     {
-        $admin = User::factory()->create(['role' => UserRole::ADMIN->value]);
-        $token = JWTAuth::fromUser($admin);
         $product = Product::factory()->create(['name' => 'Test Product']);
 
-        $this->withToken($token)
+        $this->withToken($this->tokenForRole(UserRole::ADMIN))
             ->putJson("/api/products/{$product->id}", [
                 'name' => 'New name'
             ])
@@ -143,22 +147,19 @@ class ProductControllerTest extends TestCase
     #[Test]
     public function destroy_requires_admin_role()
     {
-        $customer = User::factory()->create(['role' => UserRole::CUSTOMER->value]);
-        $token = JWTAuth::fromUser($customer);
         $product = Product::factory()->create();
 
-        $this->withToken($token)->deleteJson("/api/products/{$product->id}")
+        $this->withToken($this->tokenForRole(UserRole::CUSTOMER))
+            ->deleteJson("/api/products/{$product->id}")
             ->assertForbidden();
     }
 
     #[Test]
     public function admin_can_destroy_a_product()
     {
-        $admin = User::factory()->create(['role' => UserRole::ADMIN->value]);
-        $token = JWTAuth::fromUser($admin);
         $product = Product::factory()->create();
 
-        $this->withToken($token)
+        $this->withToken($this->tokenForRole(UserRole::ADMIN))
             ->deleteJson("/api/products/{$product->id}")
             ->assertNoContent();
         $this->assertDatabaseMissing('products', [
@@ -167,9 +168,8 @@ class ProductControllerTest extends TestCase
     }
 
     #[Test]
-    public function validation_errors_on_store_return_unprocessable_entity() {
-        $admin = User::factory()->create(['role' => UserRole::ADMIN->value]);
-        $token = JWTAuth::fromUser($admin);
+    public function validation_errors_on_store_return_unprocessable()
+    {
         $payload = [
             'name' => '',
             'type' => 'invalid',
@@ -178,7 +178,7 @@ class ProductControllerTest extends TestCase
             'image' => '',
         ];
 
-        $this->withToken($token)
+        $this->withToken($this->tokenForRole(UserRole::ADMIN))
             ->postJson('/api/products', $payload)
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['name', 'type', 'price', 'description', 'image']);

@@ -11,7 +11,6 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
@@ -19,8 +18,9 @@ class AuthController extends Controller
     public function register(UserRegisterRequest $request): JsonResponse
     {
         $userData = $request->validated();
-        $userData['role'] = UserRole::CUSTOMER;
-        $user = User::create($userData);
+        $user = User::make($userData);
+        $user->role = UserRole::CUSTOMER;
+        $user->save();
         $token = JWTAuth::fromUser($user);
 
         return response()->json(['token' => $token], Response::HTTP_CREATED);

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\OrderStatus;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -17,13 +18,13 @@ class OrderFactory extends Factory
      */
     public function definition(): array
     {
-        $statuses = ['processing', 'shipped', 'delivered', 'cancelled'];
         return [
             'user_id' => User::factory(),
-            'status' => fake()->randomElement($statuses),
+            'status' => fake()->randomElement(OrderStatus::values()),
             'delivery_address' => fake()->address(),
             'phone_number' => fake()->phoneNumber(),
-            'delivery_time' => fake()->dateTimeBetween('now', '+1 days')
+            'delivery_time' => fake()->dateTimeBetween('now', '+1 days'),
+            'total' => 0,
         ];
     }
 }

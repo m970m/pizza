@@ -22,9 +22,9 @@ class OrderStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'delivery_address' => 'required',
-            'phone_number' => 'required',
-            'delivery_time' => 'required',
+            'delivery_address' => 'required|string|min:3|max:255',
+            'phone_number' => 'required|string|min:6|max:12',
+            'delivery_time' => 'required|date|date_format:Y-m-d H:i',
         ];
     }
 }

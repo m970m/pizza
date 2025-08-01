@@ -15,7 +15,7 @@ class CartService
 {
     public function addProduct(User $user, array $productData): CartProduct
     {
-        if (!$this->validProductQuantity($user, $productData))
+        if (!$this->isValidProductQuantity($user, $productData))
         {
             throw new LimitProductException();
         }
@@ -35,10 +35,9 @@ class CartService
         ]);
     }
 
-    public function updateProducts(User $user, array $cartProductsData): Collection
+    public function updateCart(User $user, array $cartProductsData): Collection
     {
         $products = Product::whereIn('id', array_column($cartProductsData, 'product_id'))->get();
-
         $cartProductCollection = collect($cartProductsData)->keyBy('product_id');
 
         $quantityByType = $products
@@ -61,7 +60,30 @@ class CartService
         });
     }
 
-    private function validProductQuantity(User $user, array $productData): bool
+    public function removeProduct(User $user, string $productId): void
+    {
+        $cartProduct = CartProduct::where('id', $productId)
+            ->where('user_id', $user->id)
+            ->firstOrFail();
+        if ($cartProduct->quantity > 1)
+        {
+            --$cartProduct->quantity;
+            $cartProduct->save();
+        } else
+        {
+            $cartProduct->delete();
+        }
+    }
+
+    public function removeProductLine(User $user, string $productId): void
+    {
+        $cartProducts = CartProduct::where('product_id', $productId)
+            ->where('user_id', $user->id)
+            ->firstOrFail();
+        $cartProducts->delete();
+    }
+
+    private function isValidProductQuantity(User $user, array $productData): bool
     {
         $productType = ProductType::from(Product::findOrFail($productData['product_id'])->type);
         $productQuantity = $user->cartProducts()

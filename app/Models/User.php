@@ -15,8 +15,8 @@ class User extends Authenticatable implements JWTSubject
     use HasFactory;
 
     protected $table = 'users';
-    protected $guarded = ['id', 'created_at', 'updated_at'];
-    protected $hidden = ['password', 'role', 'created_at', 'updated_at'];
+    protected $guarded = ['id', 'role', 'created_at', 'updated_at'];
+    protected $hidden = ['password', 'role'];
 
     public function orders(): HasMany
     {

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('delivery_address');
             $table->string('phone_number');
             $table->dateTime('delivery_time');
+            $table->unsignedInteger('total');
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
         });

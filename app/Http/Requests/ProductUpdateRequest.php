@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\ProductType;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ProductUpdateRequest extends FormRequest
 {
@@ -23,8 +25,8 @@ class ProductUpdateRequest extends FormRequest
     {
         return [
             'name' => 'string|max:255',
-            'type' => 'string|max:255',
-            'price' => 'decimal:0,2|min:0',
+            'type' => [Rule::enum(ProductType::class)],
+            'price' => 'integer|min:0',
             'description' => 'string|max:255',
             'image' => 'string|max:255'
         ];

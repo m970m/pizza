@@ -26,7 +26,7 @@ class ProductStoreRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'type' => ['required', Rule::enum(ProductType::class)],
-            'price' => 'required|decimal:0,2|min:0',
+            'price' => 'required|integer|min:0',
             'description' => 'required|string|max:255',
             'image' => 'required|string|max:255'
         ];
