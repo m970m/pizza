@@ -38,3 +38,4 @@ services:
       MYSQL_DATABASE: laravel
     volumes:
       - ./storage:/var/lib/mysql
+      - ./mysql/initdb/:/docker-entrypoint-initdb.d
