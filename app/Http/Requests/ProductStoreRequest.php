@@ -5,7 +5,22 @@ namespace App\Http\Requests;
 use App\Enums\ProductType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use OpenApi\Attributes as OA;
 
+#[OA\Schema(
+    schema: 'ProductStoreRequest',
+    required: [
+        'name', 'type', 'price', 'description', 'image'
+    ],
+    properties: [
+        new OA\Property(property: 'name', type: 'string', example: 'Product name'),
+        new OA\Property(property: 'type', type: 'string', enum: ['pizza', 'drink'], example: 'Product type'),
+        new OA\Property(property: 'price', type: 'integer', example: 'Product price'),
+        new OA\Property(property: 'description', type: 'string', example: 'Product string'),
+        new OA\Property(property: 'image', type: 'string', example: 'Product image'),
+    ],
+    type: 'object'
+)]
 class ProductStoreRequest extends FormRequest
 {
     /**
