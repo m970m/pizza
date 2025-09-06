@@ -22,6 +22,9 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 RUN pecl install xdebug
 
+RUN pecl install redis \
+    && docker-php-ext-enable redis
+
 COPY php/conf.d/* $PHP_INI_DIR/conf.d
 
 USER appuser

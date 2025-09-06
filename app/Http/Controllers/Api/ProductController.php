@@ -11,6 +11,7 @@ use App\Http\Resources\ProductsCollection;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 use OpenApi\Attributes as OA;
 
 class ProductController extends Controller
@@ -44,7 +45,11 @@ class ProductController extends Controller
     )]
     public function index(): JsonResponse
     {
-        return response()->json(new ProductsCollection(Product::paginate(10)));
+        $paginatedProducts = Cache::remember('products_all', 60, function() {
+            return Product::paginate(10);
+        });
+
+        return response()->json(new ProductsCollection($paginatedProducts));
     }
 
     #[OA\Post(
@@ -77,6 +82,8 @@ class ProductController extends Controller
     public function store(ProductStoreRequest $request): JsonResponse
     {
         $product = Product::create($request->validated());
+        Cache::forget('products_all');
+
         return response()->json(new ProductResource($product), Response::HTTP_CREATED);
     }
 
@@ -109,18 +116,25 @@ class ProductController extends Controller
     )]
     public function show(Product $product): JsonResponse
     {
+        $product = Cache::remember("products_$product->id", 60, function() use ($product) {
+            return $product;
+        });
         return response()->json(new ProductResource($product));
     }
 
     public function update(ProductUpdateRequest $request, Product $product): JsonResponse
     {
         $product->update($request->validated());
+        Cache::forget('products_all');
+
         return response()->json(new ProductResource($product));
     }
 
     public function destroy(Product $product): JsonResponse
     {
         $product->delete();
+        Cache::forget('products_all');
+
         return response()->json(null, Response::HTTP_NO_CONTENT);
     }
 }
